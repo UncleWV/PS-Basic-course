@@ -6,3 +6,12 @@ https://github.com/mjochen/PS-Basic-course
 
 https://learngitbranching.js.org/
 
+chttps://code.visualstudio.com/
+
+https://git-scm.com/downloads
+
+https://github.com/mjochen/PS-Basic-course
+
+https://learngitbranching.js.org/
+
+https://docs.microsoft.com/en-us/teamblog/announcing-unified-powershell-experience
