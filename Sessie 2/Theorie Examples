@@ -1,0 +1,118 @@
+# Aliases
+Get-Alias
+New-Alias
+Set-Alias -Name Get-Files -Value dir
+ 
+# Displaying Information
+Format-Table
+Get-Process | Format-Table name, CPU -AutoSize
+ 
+Format-List
+Get-Process | Format-List name, CPU
+Get-Process -name notepad | Format-List *
+ 
+# hash table for format-table output
+$proces=@{
+    Label="Name";
+    Expression={$_.name};
+    Alignment="left"
+}
+ 
+$cpu=@{
+    Label="CPU Used";
+    Expression={$_.CPU};
+    FormatString="N3"
+}
+$mem=@{
+    Label="Memory";
+    Expression={$_.PM/1MB}
+}
+Get-Process | FT $proces,$cpu,$mem -AutoSize
+ 
+ 
+ 
+# Write-host and Write-output
+Write-Output "Hello world!"
+Write-Host "Hello world!"
+Write-Host "Hello world!" -ForegroundColor Black -BackgroundColor Red
+Write-Warning "Er mist een paremeter!"
+Write-Error "Er mist een paremeter!"
+ 
+# Out-Gridview
+Get-Process | Out-GridView -Title "Hello world" 
+Get-Process | Out-GridView -Title "Hello world" -PassThru
+Get-Process -name notepad | Out-GridView -Title "Select process to stop" -PassThru | Stop-Process
+ 
+# Exercises
+#• Show name, CPU-usage and (nonpaged)memory of all processes starting with “N”
+Get-process -name "N*" | FT name,CPU,npm
+ 
+#• Show all services starting with “A” in a list
+Get-Service "A*" | FL
+ 
+#• Write your name on the screen, in red with a green background (what Joe, Jack, William and Averell won’t like)
+Write-Host 'Alexander' -BackgroundColor green -ForegroundColor red
+ 
+#• Show all services with startuptype “automatic” that are not running in a gridview
+Get-Service | Where-Object StartType -eq "automatic" | Where-Object Status -eq 'Stopped' | Out-GridView
+ 
+#• Make sure you can click “ok” in above gridview to start these services
+Get-Service | Where-Object StartType -eq "automatic" | Where-Object Status -eq 'Stopped' | Out-GridView -PassThru | Start-Service
+ 
+ 
+# Write to files
+Get-Process > c:\tmp\processes.txt
+Get-Process | Out-File -FilePath c:\tmp\outfile-processes.txt
+ 
+Get-Process | Export-Csv -Path c:\tmp\processes.csv -Delimiter ";"
+ 
+Get-Process | Export-Clixml -Path "c:\tmp\proc.xml"
+Import-Clixml -Path "c:\tmp\proc.xml" | Format-Table Name, cpu, npm 
+ 
+$xml = Get-Process | ConvertTo-Xml -NoTypeInformation
+$xml.Save("c:\tmp\nice proc.xml")
+ 
+ 
+# Objects
+Get-Process | get-member
+ 
+## Envoking methods on a string object
+"Hello World!" | Get-Member
+("Hello World!").ToUpper()
+("Hello World!").ToLower()
+ 
+## Reading properties from a processes
+(Get-Process -Name notepad).CPU
+$proc = Get-Process -Name notepad
+$proc | Get-Member
+$proc.Name
+$proc.ToString() | Get-Member
+$proc.ToString().ToUpper()
+ 
+## reading get-date objects (System.DateTime)
+Get-Date | Get-Member
+(Get-Date).AddDays(3).DayOfWeek
+(Get-Process).Name
+ 
+## with variables
+$now = Get-Date
+$now.DayOfWeek
+ 
+# Variables
+## setting variables will automaticly assign datatype
+$a = 5
+$a.GetType()
+$a = $a/2
+$a.GetType()
+$a = "A string"
+$a.GetType()
+ 
+## declaring datatype
+[string]$tekst = 5
+$tekst.GetType()
+$tekst + 7
+ 
+## writing a lot of objects to single variable
+$procs = Get-Process
+$procs | get-member
+$procs.Count
