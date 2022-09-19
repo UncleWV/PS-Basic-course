@@ -1,0 +1,84 @@
+# Filtering and sorting object
+ 
+## Where-Object
+Get-Process
+Get-Process | Where-Object Name -like "N*"
+Get-Process | Where-Object {$_.Name -like "N*"}
+Get-Process | Where-Object {$_.Name -like "N*" -and $_.Name -like "*pad"}
+ 
+## Sort-Object
+Get-Process | Sort-Object CPU
+Get-Process | Sort-Object CPU -Descending
+Get-Process | Sort-Object Name, CPU
+Get-Process | Sort-Object Name -Unique
+ 
+## Select-Object
+Get-Process | Select-Object Name, CPU
+ 
+## Select top X rows
+Get-Process | Sort-Object CPU -Descending | Select-Object -First 5
+ 
+### BEWARE! Object castrating
+Get-Process | Get-Member
+## Many rows
+Get-Process | Select-Object Name, CPU | Get-Member
+# a few rows
+ 
+## Adding properties
+$myProc = Get-Process notepad |
+Select-Object Name, CPU, @{Name="UPNAME";Expression={"$($_.Name.ToUpper())"}}
+$myProc.UPNAME
+$myProc | Get-Member
+ 
+$myProc = Get-Process notepad |
+Select-Object *, @{Name="UPNAME";Expression={"$($_.Name.ToUpper())"}}
+$myProc.UPNAME
+$myProc | Get-Member
+ 
+ 
+ 
+### Expanding a property
+Get-Process notepad | Get-Member
+$NameString = (Get-Process notepad).Name
+$NameString | Get-Member
+ 
+Get-Process notepad | Select-Object -ExpandProperty Name | Get-Member
+Get-command Get-process | Select-Object -ExpandProperty Parameters
+ 
+$proc = Get-Process
+( $proc | Select-Object "Name" ) -join ", "
+( $proc | Select-Object -ExpandProperty "Name" ) -join ", "
+ 
+ 
+## Group-Object
+### Returns a GroupInfo object containing original objects grouped by property
+Get-Process | Group-Object Company
+Get-Process | Group-Object Company | Get-Member
+ 
+ 
+## Measure-Object
+### Returns MeasureInfo Object that does NOT contain the original objects
+Get-Process | Measure-Object CPU -Sum -Average -Minimum -Maximum -StandardDeviation
+Get-Process | Measure-Object CPU -Sum -Average | Get-Member
+ 
+## Object Exercises
+ 
+### How long has my CPU been used in minutes?
+(Get-Process | Measure-Object CPU -Sum).Sum / 60
+(Get-Process | Measure-Object CPU -Sum).Sum / 60 / 60
+(Get-Process | Measure-Object CPU -Sum).Sum / 60 / 60 / 24
+ 
+### Get all services with a name longer than 7 characters
+Get-Service -Name "????????*"
+ 
+### From the Systemeventlog, show all messages
+#### in Pwsh 5
+Get-EventLog -Logname system -After (get-date).AddDays(-1) | Select-Object message
+ 
+### in Pwsh 7
+Where-Object {$_.TimeCreated -ge (get-date).AddDays(-2) -and $_.TimeCreated -le (get-date).AddDays(-1) } |
+Select-Object message
+ 
+# Foreach-Object
+Get-Process | ForEach-Object { $_ }
+Get-Process | ForEach-Object { Write-Host $_.Name -ForegroundColor Cyan }
