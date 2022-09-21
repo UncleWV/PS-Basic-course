@@ -1,7 +1,7 @@
 <#
 .SYNOPSIS
 upload given file to azure blob storage and return url as string
-.PARAMETER path
+.PARAMETER Path
 path to local file that will be uploaded
 .PARAMETER Name
 
